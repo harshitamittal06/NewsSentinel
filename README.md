@@ -1,6 +1,5 @@
 # NewsSentinel 🛡️
 ### AI-Powered Fake News and Misinformation Pattern Detection System
-*Phase 5: Explainable AI, SQLite Persistence, Uncertainty Detection & Reliability Suite*
 
 ---
 
