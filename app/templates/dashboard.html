@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}Command Dashboard{% endblock %}
+
+{% block content %}
+<!-- Welcome Hero Banner -->
+<section class="hero-banner">
+  <div class="hero-tag">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+      <path d="M2 17l10 5 10-5"></path>
+      <path d="M2 12l10 5 10-5"></path>
+    </svg>
+    <span>Misinformation Intelligence & Analytics Platform</span>
+  </div>
+  <h1 class="hero-title">Welcome to <span class="gradient-text">NewsSentinel</span></h1>
+  <p class="hero-subtitle">
+    An AI-powered textual integrity and misinformation pattern detection system designed to analyze headlines,
+    articles, and digital media claims. Powered by our calibrated Linear SVM model trained on the WELFake benchmark corpus (96.59% test accuracy).
+  </p>
+</section>
+
+<!-- High-Level Platform Statistics -->
+<section class="stats-grid">
+  <!-- Card 1: Total Analyses -->
+  <div class="stat-card">
+    <div class="stat-card-top">
+      <span class="stat-label">Total Analyses</span>
+      <div class="stat-icon stat-icon-violet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">{{ stats.total_analyses }}</div>
+    <div class="stat-meta">
+      <span class="stat-pill stat-pill-active">Session Active</span>
+      <span>Live counter</span>
+    </div>
+  </div>
+
+  <!-- Card 2: Fake News Detected -->
+  <div class="stat-card">
+    <div class="stat-card-top">
+      <span class="stat-label">Fake News Detected</span>
+      <div class="stat-icon stat-icon-red">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">{{ stats.fake_detected }}</div>
+    <div class="stat-meta">
+      <span class="stat-pill stat-pill-neutral">{{ stats.fake_percent }}% of total</span>
+      <span>Classified Fake</span>
+    </div>
+  </div>
+
+  <!-- Card 3: Real News Detected -->
+  <div class="stat-card">
+    <div class="stat-card-top">
+      <span class="stat-label">Real News Detected</span>
+      <div class="stat-icon stat-icon-green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">{{ stats.real_detected }}</div>
+    <div class="stat-meta">
+      <span class="stat-pill stat-pill-neutral">{{ stats.real_percent }}% of total</span>
+      <span>Classified Real</span>
+    </div>
+  </div>
+
+  <!-- Card 4: Uncertain Flagged -->
+  <div class="stat-card">
+    <div class="stat-card-top">
+      <span class="stat-label">Uncertain / Review</span>
+      <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">{{ stats.uncertain_detected if stats.uncertain_detected is defined else 0 }}</div>
+    <div class="stat-meta">
+      <span class="stat-pill stat-pill-neutral">{{ stats.uncertain_percent if stats.uncertain_percent is defined else 0 }}% of total</span>
+      <span>Threshold &lt; 65%</span>
+    </div>
+  </div>
+
+  <!-- Card 5: Model Accuracy -->
+  <div class="stat-card">
+    <div class="stat-card-top">
+      <span class="stat-label">Model Accuracy</span>
+      <div class="stat-icon stat-icon-cyan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polygon points="12 6 12 12 14 14"></polygon>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">{{ stats.model_accuracy_display }}</div>
+    <div class="stat-meta">
+      <span class="stat-pill stat-pill-active" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3);">Linear SVM Active</span>
+      <span>Held-out test set</span>
+    </div>
+  </div>
+</section>
+
+<!-- Notice Banner -->
+<div class="integrity-notice" style="margin-bottom: 24px;">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="12" y1="8" x2="12" y2="12"></line>
+    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+  </svg>
+  <div class="integrity-notice-text">
+    <h4>Advisory & Operational Disclaimer</h4>
+    <p>
+      <strong>NewsSentinel identifies linguistic patterns learned from its training data. It does not independently verify sources, events, quotations or factual claims.</strong>
+      Predictions and model confidence represent statistical pattern matching within the WELFake benchmark corpus, not factual certainty.
+    </p>
+  </div>
+</div>
+
+<!-- Large News Analysis Input Area -->
+<section class="analyzer-container">
+  <div class="analyzer-header">
+    <div class="analyzer-title-group">
+      <h2>Quick News Analysis Console</h2>
+      <p>Paste a news headline, article excerpt, or digital media report to run real-time pattern detection.</p>
+    </div>
+    <div class="sample-pills">
+      <button type="button" class="sample-pill-btn" id="sample-headline-1">
+        + Sample Real News (Reuters)
+      </button>
+      <button type="button" class="sample-pill-btn" id="sample-headline-2">
+        + Sample Sensational Clickbait
+      </button>
+    </div>
+  </div>
+
+  <div class="input-wrapper" style="margin-bottom: 14px;">
+    <input
+      type="text"
+      id="news-headline"
+      class="analyzer-textarea"
+      style="min-height: 48px; height: 48px; resize: none; margin-bottom: 10px; font-weight: 500;"
+      placeholder="Headline or Article Title (Optional)..."
+    />
+    <textarea
+      id="news-input"
+      class="analyzer-textarea"
+      placeholder="Paste news headline or full article text here for analysis (e.g. 'BREAKING: Global consortium verifies breakthrough in nuclear fusion efficiency...')"
+      rows="5"
+    ></textarea>
+  </div>
+
+  <div class="form-footer">
+    <div class="telemetry-indicators">
+      <div class="telemetry-item">
+        <span>Characters:</span>
+        <span class="count" id="char-count">0</span>
+      </div>
+      <div class="telemetry-item">
+        <span>Words:</span>
+        <span class="count" id="word-count">0</span>
+      </div>
+      <div class="telemetry-item">
+        <span>Est. Read Time:</span>
+        <span class="count" id="reading-time">0s</span>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" id="btn-clear-input">
+        Clear
+      </button>
+      <button type="button" class="btn-primary" id="btn-analyze-news">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span>Analyze News</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dynamic Result Container (Populated via fetch to /api/analyze) -->
+  <div id="analysis-result-container" style="display: none;"></div>
+</section>
+
+<!-- Analytics & Activity Section -->
+<section class="analytics-dual-grid">
+  <!-- Analytics Distribution / Model Status -->
+  <div class="analytics-card">
+    <div class="analytics-card-header">
+      <div>
+        <h3 class="analytics-title">Trained Model Status</h3>
+        <p class="analytics-subtitle">Phase 3 Champion Linear SVM configuration and benchmark telemetry.</p>
+      </div>
+      <span class="stat-pill stat-pill-active" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3);">Active</span>
+    </div>
+
+    <div style="padding: 16px 0;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
+        <div class="feature-box">
+          <div class="feature-title">Champion Model</div>
+          <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">Linear SVM (Calibrated)</div>
+        </div>
+        <div class="feature-box">
+          <div class="feature-title">Test Accuracy</div>
+          <div class="feature-num" style="color: #34D399;">96.59%</div>
+        </div>
+        <div class="feature-box">
+          <div class="feature-title">Feature Extractor</div>
+          <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">TF-IDF (1, 2) N-grams</div>
+        </div>
+        <div class="feature-box">
+          <div class="feature-title">Vocabulary Size</div>
+          <div class="feature-num" style="color: #38BDF8;">50,000</div>
+        </div>
+      </div>
+      <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">
+        Trained on 43,810 articles and validated on 9,388 articles using stratified sampling. Evaluated on 9,388 unseen held-out test articles.
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity Feed -->
+  <div class="analytics-card">
+    <div class="analytics-card-header">
+      <div>
+        <h3 class="analytics-title">Recent Activity Feed</h3>
+        <p class="analytics-subtitle">Live stream of incoming text evaluations and classifications.</p>
+      </div>
+      <span class="stat-pill stat-pill-neutral">{{ recent_records|length if recent_records else 0 }} Logged</span>
+    </div>
+
+    {% if recent_records and recent_records|length > 0 %}
+    <div style="padding: 8px 0; max-height: 260px; overflow-y: auto;">
+      {% for item in recent_records %}
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-subtle);">
+        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%;">
+          <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-main);">{{ item.snippet }}</div>
+          <div style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">{{ item.timestamp }}</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="result-status-badge {{ 'badge-real' if item.prediction == 'Real' and not item.is_uncertain else ('badge-uncertain' if item.prediction == 'Uncertain' or item.is_uncertain else 'badge-fake') }}" style="font-size: 0.68rem; padding: 2px 8px;">
+            {{ 'UNCERTAIN — NEEDS VERIFICATION' if item.is_uncertain or item.prediction == 'Uncertain' else ('MODEL PREDICTION: REAL' if item.prediction == 'Real' else 'MODEL PREDICTION: FAKE') }}
+          </span>
+          <span style="font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-secondary);">
+            {{ item.confidence_display }}
+          </span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="standby-frame" style="padding: 30px 16px;">
+      <div class="standby-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+      </div>
+      <h4 class="standby-title">No Analyses Logged Yet</h4>
+      <p class="standby-desc">
+        Submissions from the News Analyzer console will appear in this feed with live classifications.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

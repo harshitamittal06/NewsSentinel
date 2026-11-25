@@ -1,0 +1,74 @@
+================================================================================
+ NEWSSENTINEL - PHASE 2: PRIMARY DATASET CLEANING & STANDARDIZATION
+ Dataset: WELFake (Word Embedding over Linguistic Features for Fake News)
+================================================================================
+ Project Root: NewsSentinel project directory
+ Raw Source:   data\raw\WELFake_Dataset.csv
+ Target Clean: data\processed\WELFake_cleaned.csv
+
+[1] Loading raw WELFake dataset into memory...
+    * Raw File Size on Disk: 233.73 MB
+    * Initial Ingested Rows: 72,134
+    * Initial Columns:       ['Unnamed: 0', 'title', 'text', 'label']
+
+[2] Schema Standardization:
+    * Dropped unneeded raw index column: 'Unnamed: 0'
+
+[3] Missing & Whitespace-Only Value Investigation:
+    * Records with Missing/Empty Title: 558 (0.77%)
+    * Records with Missing/Empty Text:  783 (1.09%)
+    * Records with Both Missing:        0 (0.00%)
+    * Total Invalid / Incomplete Rows:  1,341 (1.86%)
+    * Policy: Discard incomplete records to ensure rigorous NLP feature quality.
+    * Rows Retained after Missing Filter: 70,793
+
+[4] Duplicate Investigation & Deduplication:
+    * Duplicate (Title + Text) Pairs Found: 8,207 (11.59%)
+    * Unique (Title + Text) Articles:        62,586
+    * Sample Most Frequently Syndicated Titles:
+      1. [7 duplicate copies] "highlights: the trump presidency on april 13 at 9:30 p.m. edt/013..."
+      2. [4 duplicate copies] "highlights: the trump presidency on april 21 at 6:12 p.m. edt/221..."
+      3. [4 duplicate copies] "highlights: the trump presidency on march 31 at 6:19 p.m. edt"
+    * Policy: Keep first occurrence and discard identical duplicate copies.
+    * Eliminates train-test split contamination & inflated accuracy artifacts.
+    * Rows Retained after Deduplication: 62,586
+
+[5] Label Verification & Standardization:
+    * Forensic Audit of Raw WELFake Labels:
+      - Verified Reuters Articles in Clean Data: 21,059
+      - Verified New York Times in Clean Data:  6,303
+      - Raw Label Distribution for Reuters:    {0: np.int64(21046), 1: np.int64(13)}
+      - Raw Label Distribution for NYT:        {0: np.int64(6257), 1: np.int64(46)}
+
+    * Official Published Kaggle / Zenodo Standard (Verma et al.):
+      - Expected Schema: 0 = Fake News, 1 = Real News
+      - In the raw exported CSV, Reuters / NYT articles bear raw value 0,
+        while viral conspiracy stories bear raw value 1 (an inverted export).
+      - To establish flawless consistency with the official benchmark standard,
+        the cleaned dataset explicitly standardizes the target mapping to:
+          -> Label 1 = REAL NEWS   (Verified Journalism: Reuters, NYT, McIntire)
+          -> Label 0 = FAKE NEWS   (Fabricated / Misinformation / Clickbait)
+        And adds an unambiguous 'label_name' column ('Real' / 'Fake').
+
+    * Standardized Class Distribution in Cleaned Dataset:
+      - Real News (Label 1): 34,788 (55.58%)
+      - Fake News (Label 0): 27,798 (44.42%)
+      - Total Validated Records: 62,586
+      - Balance Ratio: 1.25:1 (Well-Balanced Corpus)
+
+[6] Exporting Cleaned Dataset:
+    * Clean CSV written to: data\processed\WELFake_cleaned.csv
+    * Final Clean File Size: 206.72 MB
+    * Total Records Saved:   62,586
+
+================================================================================
+ CLEANING SUMMARY & SANITY VERIFICATION
+================================================================================
+  * Initial Raw Records:              72,134
+  * Removed Incomplete/Missing Rows:  -1,341 (-1.86%)
+  * Removed Redundant Duplicate Rows: -8,207 (-11.38%)
+  * Total Removed / Filtered:         -9,548 (-13.24%)
+  * Final Clean Corpus Rows:           62,586 (100% Unique & Complete)
+  * Original Raw File Intact:          YES (True)
+  * Execution Time:                    14.22 seconds
+================================================================================

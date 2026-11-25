@@ -1,0 +1,93 @@
+{
+  "model_name": "Linear SVM (Calibrated)",
+  "model_file": "best_model.joblib",
+  "vectorizer_file": "tfidf_vectorizer.joblib",
+  "training_timestamp": "2026-11-20 01:34:14",
+  "dataset": "WELFake_cleaned.csv",
+  "dataset_rows": 62586,
+  "splits": {
+    "train": 43810,
+    "val": 9388,
+    "test": 9388,
+    "ratio": "70/15/15",
+    "stratified": true,
+    "random_state": 42
+  },
+  "features": {
+    "type": "TF-IDF",
+    "ngram_range": [
+      1,
+      2
+    ],
+    "max_features": 50000,
+    "sublinear_tf": true,
+    "stop_words": "english"
+  },
+  "labels": {
+    "0": "Fake",
+    "1": "Real"
+  },
+  "champion_validation_metrics": {
+    "accuracy": 0.972092032381764,
+    "confusion_matrix": {
+      "TN_fake": 4034,
+      "FP_predicted_real": 135,
+      "FN_predicted_fake": 127,
+      "TP_real": 5092,
+      "raw_matrix": [
+        [
+          4034,
+          135
+        ],
+        [
+          127,
+          5092
+        ]
+      ]
+    },
+    "fake_class_0": {
+      "precision": 0.9694784907474164,
+      "recall": 0.9676181338450468,
+      "f1_score": 0.968547418967587
+    },
+    "real_class_1": {
+      "precision": 0.9741725655251579,
+      "recall": 0.9756658363671201,
+      "f1_score": 0.9749186291403408
+    },
+    "macro_f1": 0.9717330240539639,
+    "weighted_f1": 0.9720893177630282,
+    "train_time_seconds": 5.325
+  },
+  "champion_test_metrics": {
+    "accuracy": 0.965913932680017,
+    "confusion_matrix": {
+      "TN_fake": 4008,
+      "FP_predicted_real": 162,
+      "FN_predicted_fake": 158,
+      "TP_real": 5060,
+      "raw_matrix": [
+        [
+          4008,
+          162
+        ],
+        [
+          158,
+          5060
+        ]
+      ]
+    },
+    "fake_class_0": {
+      "precision": 0.9620739318290926,
+      "recall": 0.9611510791366906,
+      "f1_score": 0.9616122840690979
+    },
+    "real_class_1": {
+      "precision": 0.9689774032937571,
+      "recall": 0.9697201993100805,
+      "f1_score": 0.9693486590038314
+    },
+    "macro_f1": 0.9654804715364647,
+    "weighted_f1": 0.9659122845387867
+  }
+}

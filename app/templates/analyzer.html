@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}News Analyzer{% endblock %}
+
+{% block content %}
+<!-- Analyzer Page Header Banner -->
+<section class="hero-banner">
+  <div class="hero-tag">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <span>Machine Learning Intelligence & Verification Console</span>
+  </div>
+  <h1 class="hero-title">News <span class="gradient-text">Analyzer Engine</span></h1>
+  <p class="hero-subtitle">
+    Submit news headlines, investigative reports, or digital media claims for real-time veracity analysis.
+    Powered by our calibrated Linear Support Vector Machine and TF-IDF feature extractor (50,000 n-gram vocabulary),
+    trained and validated on 62,586 articles from the WELFake benchmark corpus (96.59% test accuracy).
+  </p>
+</section>
+
+<!-- Full-Featured Analyzer Workspace -->
+<section class="analyzer-container">
+  <div class="analyzer-header">
+    <div class="analyzer-title-group">
+      <h2>Article & Headline Ingestion Console</h2>
+      <p>Enter an optional headline and full article text up to 50,000 characters.</p>
+    </div>
+    <div class="sample-pills">
+      <button type="button" class="sample-pill-btn" id="sample-headline-1">
+        Load Sample Real News (Reuters)
+      </button>
+      <button type="button" class="sample-pill-btn" id="sample-headline-2">
+        Load Sample Sensational Clickbait
+      </button>
+    </div>
+  </div>
+
+  <div class="input-wrapper" style="margin-bottom: 14px;">
+    <input
+      type="text"
+      id="news-headline"
+      class="analyzer-textarea"
+      style="min-height: 48px; height: 48px; resize: none; margin-bottom: 10px; font-weight: 500;"
+      placeholder="Headline or Article Title (Optional)..."
+    />
+    <textarea
+      id="news-input"
+      class="analyzer-textarea"
+      placeholder="Paste news article body, claim paragraph, or press release excerpt here for pattern detection..."
+      rows="8"
+    ></textarea>
+  </div>
+
+  <div class="form-footer">
+    <div class="telemetry-indicators">
+      <div class="telemetry-item">
+        <span>Characters:</span>
+        <span class="count" id="char-count">0</span>
+      </div>
+      <div class="telemetry-item">
+        <span>Words:</span>
+        <span class="count" id="word-count">0</span>
+      </div>
+      <div class="telemetry-item">
+        <span>Est. Read Time:</span>
+        <span class="count" id="reading-time">0s</span>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" id="btn-clear-input">
+        Clear Workspace
+      </button>
+      <button type="button" class="btn-primary" id="btn-analyze-news">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span>Run Veracity Scan</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dynamic Result Container (Populated via fetch to /api/analyze) -->
+  <div id="analysis-result-container" style="display: none;"></div>
+</section>
+
+<!-- Architectural Overview of the Analysis Pipeline -->
+<section class="docs-grid">
+  <div class="doc-card">
+    <div class="doc-card-header">
+      <div class="doc-card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="4 7 4 4 20 4 20 7"></polyline>
+          <line x1="9" y1="20" x2="15" y2="20"></line>
+          <line x1="12" y1="4" x2="12" y2="20"></line>
+        </svg>
+      </div>
+      <div>
+        <h3>Linguistic Feature Extraction</h3>
+        <span class="stat-pill stat-pill-neutral">Phase 2 Completed</span>
+      </div>
+    </div>
+    <p>
+      Deterministic stylometric analysis quantifies textual attributes known to correlate with misinformation:
+      excessive uppercase utilization (sensational shouting), hyperbolic punctuation markers (! and ? clusters),
+      lexical richness, and sentence complexity.
+    </p>
+  </div>
+
+  <div class="doc-card">
+    <div class="doc-card-header">
+      <div class="doc-card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+      </div>
+      <div>
+        <h3>Machine Learning Inference</h3>
+        <span class="stat-pill stat-pill-active" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3);">Linear SVM Active</span>
+      </div>
+    </div>
+    <p>
+      Our champion model is a calibrated Linear Support Vector Classifier utilizing 50,000 unigram and bigram TF-IDF features with sublinear term-frequency scaling. Evaluated on 9,388 unseen test articles, it achieves a 96.59% accuracy and 0.9655 macro F1-score with Platt-calibrated probability distributions.
+    </p>
+  </div>
+</section>
+{% endblock %}

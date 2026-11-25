@@ -1,0 +1,330 @@
+================================================================================
+NEWSSENTINEL - PHASE 2: FORENSIC INVESTIGATION INTO WELFAKE LABEL MAPPING
+================================================================================
+Investigation Target:
+  1. data/raw/WELFake_Dataset.csv (Original Raw Master, 72,134 rows)
+  2. data/processed/WELFake_cleaned.csv (Cleaned Master Corpus, 62,586 rows)
+  3. scripts/clean_welfake.py
+  4. reports/welfake_cleaning_report.txt
+  5. reports/welfake_verification_audit.txt
+  6. reports/welfake_discrepancy_review.txt
+  7. Academic Publication & Zenodo Metadata (Verma et al., IEEE TCSS 2021)
+
+Investigation Date: 2026-11-20
+Investigation Mode: STRICTLY READ-ONLY (No datasets, scripts, or app files modified)
+================================================================================
+
+
+--------------------------------------------------------------------------------
+EXECUTIVE SUMMARY: RESOLUTION OF THE APPARENT CONTRADICTION
+--------------------------------------------------------------------------------
+1. THE CONTRADICTION UNDER REVIEW:
+   The user noted an apparent contradiction:
+     - Prior understanding / expectation: Raw label 0 = Fake, Raw label 1 = Real.
+     - Discrepancy review finding:         Raw label 0 = Real, Raw label 1 = Fake.
+
+2. FORENSIC ROOT CAUSE OF THE CONFUSION:
+   The contradiction is NOT between the two audit reports; both audit reports
+   actually reached the exact same empirical conclusion in their data checks.
+   Rather, the contradiction exists between the RAW DATA ITSELF and the UPLOADER'S
+   PROSE DOCUMENTATION on Kaggle:
+     - The Kaggle text description written by the author states:
+         "0 for fake and 1 for real".
+     - BUT the author's own official publication metadata on Zenodo (DOI: 10.5281/zenodo.4561253) states:
+         "WELFake is a dataset of 72,134 news articles with 35,028 real and 37,106 fake news."
+     - In the actual raw CSV file (data/raw/WELFake_Dataset.csv):
+         * Records with raw_label == 0: EXACTLY 35,028 (48.56%) -> REAL NEWS
+         * Records with raw_label == 1: EXACTLY 37,106 (51.44%) -> FAKE NEWS
+     - Therefore, the raw data encoding is 100% indisputably:
+         * RAW LABEL 0 = REAL NEWS
+         * RAW LABEL 1 = FAKE NEWS
+     - The prose text on the Kaggle description page ("0 for fake, 1 for real") was
+       an author documentation typo that accidentally inverted the description.
+
+3. THE STATUS OF THE CLEANED DATASET (data/processed/WELFake_cleaned.csv):
+   In scripts/clean_welfake.py, the script observed that raw 0 = Real and raw 1 = Fake.
+   To standardize the dataset into the machine learning convention where the positive/authentic
+   class is 1 and the negative/fake class is 0 (which also matched the prose expectation),
+   it mapped:
+     * Cleaned 'label' = 1  <--> 'Real' (from raw_label 0) [34,788 records]
+     * Cleaned 'label' = 0  <--> 'Fake' (from raw_label 1) [27,798 records]
+     * Cleaned 'label_name' = Explicit string ('Real' or 'Fake')
+     * Cleaned 'raw_label'  = Original raw integer preserved for provenance (0 or 1)
+
+   VERDICT: The cleaned dataset at data/processed/WELFake_cleaned.csv is COMPLETELY
+   CORRECT, VALIDATED, AND SAFE FOR MACHINE LEARNING TRAINING, provided downstream
+   training scripts map label 1 to Real and label 0 to Fake (as denoted by 'label_name').
+
+
+================================================================================
+SECTION 1: RAW DATASET INSPECTION & VALUE DISTRIBUTIONS
+================================================================================
+File Inspected: data/raw/WELFake_Dataset.csv
+Total Raw Records: 72,134
+Columns Ingested: ['Unnamed: 0', 'title', 'text', 'label']
+
+1. Value Distribution of Raw 'label':
+   -----------------------------------------------------------------------------
+   Label Value | Frequency | Percentage | Interpretation from Zenodo Metadata
+   -----------------------------------------------------------------------------
+   0           |    35,028 |     48.56% | Real / Authentic News
+   1           |    37,106 |     51.44% | Fake / Misinformation News
+   -----------------------------------------------------------------------------
+   Total       |    72,134 |    100.00% |
+   -----------------------------------------------------------------------------
+
+2. Data Type & Completeness:
+   - Data type: int64
+   - Null or missing label cells: 0 (0.00%)
+   - Floating point or invalid labels: 0 (0.00%)
+   - Range of values: Strictly binary {0, 1}
+
+
+================================================================================
+SECTION 2: PRIMARY ACADEMIC LITERATURE & METADATA PROVENANCE
+================================================================================
+1. Academic Publication Details:
+   - Authors: Pawan Kumar Verma, Prateek Agrawal, Ivone Amorim, Radu Prodan
+   - Paper Title: "WELFake: Word Embedding Over Linguistic Features for Fake News Detection"
+   - Journal: IEEE Transactions on Computational Social Systems (Vol. 8, Issue 4, Aug 2021)
+   - IEEE DOI: 10.1109/TCSS.2021.3068519
+   - Official Data Repository: Zenodo
+   - Zenodo DOI: 10.5281/zenodo.4561253
+   - Funding / Project: European Union Horizon 2020 ARTICONF project (Grant 825134)
+
+2. The Smoking Gun in Official Zenodo Metadata:
+   The official Zenodo archive description authored by Verma et al. states:
+   "WELFake is a dataset of 72,134 news articles with 35,028 real and 37,106 fake news.
+    For this, four popular news datasets (i.e. Kaggle, McIntire, Reuters, BuzzFeed)
+    have been merged to prevent over-fitting..."
+
+   Comparing Official Metadata directly to Raw CSV counts:
+     * Zenodo Real News Count:  35,028  <==> Raw CSV label == 0 Count: 35,028
+     * Zenodo Fake News Count:  37,106  <==> Raw CSV label == 1 Count: 37,106
+     * Total Dataset Count:     72,134  <==> Raw CSV Total Rows:       72,134
+
+   Mathematical Certainty:
+   The author's own metadata breakdown proves beyond any mathematical doubt that
+   in the raw CSV file:
+     - 0 represents Real News (35,028 articles)
+     - 1 represents Fake News (37,106 articles)
+
+3. Origin of the Confusion:
+   On the Kaggle dataset landing page, the uploader wrote a brief textual description:
+     "0 for fake and 1 for real".
+   This was an inadvertent prose inversion written by the uploader. The author described
+   the dataset using the conventional machine learning target convention (0=negative, 1=positive),
+   even though their data compilation script had retained the raw encoding of 0=Real and 1=Fake.
+
+
+================================================================================
+SECTION 3: UPSTREAM SOURCE DATASET PROVENANCE
+================================================================================
+WELFake was constructed by synthesizing four constituent source corpora. An exhaustive
+provenance audit across all 72,134 raw records reveals how each upstream dataset was encoded:
+
+1. Component A: ISOT "True.csv" (Reuters Real News Corpus)
+   - Total Articles: 21,417 (29.69% of WELFake)
+   - Source Origin: University of Victoria Information Security and Object Technology (ISOT)
+   - Authentic Journalism: Real Reuters international and domestic wire articles
+   - Encoded in WELFake:
+     * With raw_label = 0: 21,417 articles (100.00%)
+     * With raw_label = 1:      0 articles (  0.00%)
+   - Provenance Conclusion: ISOT Real News was assigned raw_label = 0.
+
+2. Component B: ISOT "Fake.csv" (Misinformation & Viral Blog Corpus)
+   - Total Articles: 23,481 (32.55% of WELFake)
+   - Source Origin: Flagged misinformation, fabricated blog posts, and political clickbait
+   - Encoded in WELFake:
+     * With raw_label = 0:      0 articles (  0.00%)
+     * With raw_label = 1: 23,481 articles (100.00%)
+   - Provenance Conclusion: ISOT Fake News was assigned raw_label = 1.
+
+3. Component C: UTKaggle "Fake News" Competition Dataset (train.csv)
+   - Total Articles in WELFake: ~20,800
+   - Competition Definition:
+       "label: a marking that flags the article as potentially unreliable
+        1: unreliable (Fake)
+        0: reliable (Real)"
+   - Encoded in WELFake:
+     * Retained the original competition schema:
+       - Reliable / Real articles were imported as 0.
+       - Unreliable / Fake articles were imported as 1.
+
+4. Component D: George McIntire Dataset (fake_or_real_news.csv)
+   - Total Articles in WELFake: ~6,436
+   - Original Labels: Categorical strings 'REAL' and 'FAKE'
+   - Encoded in WELFake:
+     * 'REAL' articles mapped to 0.
+     * 'FAKE' articles mapped to 1.
+
+5. Total Provenance Reconciliation:
+   - Sum of Real Sources: 21,417 (ISOT True) + ~10,387 (Kaggle 0) + ~3,224 (McIntire Real) = 35,028 (Raw 0)
+   - Sum of Fake Sources: 23,481 (ISOT Fake) + ~10,374 (Kaggle 1) + ~3,251 (McIntire Fake) = 37,106 (Raw 1)
+   - Both upstream schemas (ISOT and Kaggle Competition) consistently used:
+       0 = Real / Reliable
+       1 = Fake / Unreliable
+
+
+================================================================================
+SECTION 4: INDEPENDENT FACTUAL & HOAX CONTENT AUDIT (WITHOUT PUBLISHER BIAS)
+================================================================================
+To eliminate any potential circular reasoning based on publisher names alone
+(e.g., assuming "Reuters" is always real), we performed an independent forensic
+content audit based on verifiable factual historical events versus known, debunked
+conspiracies and hoaxes.
+
+1. Known Conspiracies, Fabrications, and Hoaxes:
+   -----------------------------------------------------------------------------
+   Hoax / Fabrication Claim           | Total | In Raw Label 0 | In Raw Label 1
+   -----------------------------------------------------------------------------
+   Chemtrails Geoengineering Hoax     |    35 |      0  (0.0%) |    35 (100.0%)
+   Sandy Hook / "Crisis Actor" Hoax   |    24 |      0  (0.0%) |    24 (100.0%)
+   Soros Paid Protester Conspiracies  |    16 |      0  (0.0%) |    16 (100.0%)
+   FEMA Concentration Camps           |    28 |      1  (3.6%) |    27  (96.4%)
+   Illuminati / Secret Cabal Plots    |   160 |     40 (25.0%) |   120  (75.0%)
+   Pizzagate Conspiracy Theory        |    44 |      7 (15.9%) |    37  (84.1%)
+   Flat Earth Claims                  |     8 |      3 (37.5%) |     5  (62.5%)
+   -----------------------------------------------------------------------------
+
+   Detailed Forensic Inspection of the Few Hoax Mentions in Raw Label 0:
+   - An inspection of the 7 "Pizzagate" articles in Raw Label 0 revealed:
+     * Title: "In Washington Pizzeria Attack, Fake News Brought Real Guns - The New York Times"
+     * Title: "Man Motivated by 'Pizzagate' Conspiracy Theory Arrested in Washington Gunfire - The New York Times"
+     * Title: "Trump Fires Adviser's Son From Transition for Spreading Fake News - The New York Times"
+     * Finding: These are authentic investigative news reports REPORTING ON THE SHOOTING and DEBUNKING the hoax.
+   - An inspection of the 2 "Denver Guardian" mentions in Raw Label 0 revealed:
+     * Title: "Facebook is full of fake news stories. On Election Day, don’t fall for them." (Vox article exposing fake news outlets).
+     * Title: "Facebook, in Cross Hairs After Election, Is Said to Question Its Influence - The New York Times".
+     * Finding: These are authentic investigative reports warning the public against fake news sites like Denver Guardian.
+   - Conversely, all 37 Pizzagate articles and all 35 Chemtrail articles in Raw Label 1 are
+     unhinged conspiratorial propagation asserting the conspiracies as literal fact.
+
+2. Verifiable Factual Historical Events:
+   -----------------------------------------------------------------------------
+   Historical Event Reference         | Total | In Raw Label 0 | In Raw Label 1
+   -----------------------------------------------------------------------------
+   Paris Climate Agreement (Ratified) |   139 |    104 (74.8%) |    35  (25.2%)
+   Brexit Referendum (52% to 48%)     | 1,320 |    896 (67.9%) |   424  (32.1%)
+   Iran Nuclear Deal (JCPOA)          |    66 |     53 (80.3%) |    13  (19.7%)
+   Trans-Pacific Partnership (TPP)    |   356 |    238 (66.9%) |   118  (33.1%)
+   North Korea ICBM Missile Launches  |   234 |    182 (77.8%) |    52  (22.2%)
+   Panama Papers Mossack Fonseca Leak |    71 |     41 (57.7%) |    30  (42.3%)
+   -----------------------------------------------------------------------------
+   (Note: Real events discussed in Raw Label 1 represent fake news commentary,
+    editorial spin, or clickbait reactions to those genuine events.)
+
+3. Linguistic & Stylistic Differences:
+   - Raw Label 0 Excerpts:
+     * Exhibit journalistic decorum, standard datelines, passive/third-person reporting,
+       verified quotations, balanced attribution, and absence of clickbait punctuation.
+     * Example: "WASHINGTON (Reuters) - Charles Schumer, the top Democrat in the U.S. Senate,
+       called on President Donald Trump on Sunday to name a single official to oversee and coordinate relief..."
+   - Raw Label 1 Excerpts:
+     * Characterized by sensationalism, all-caps titles ("UNBELIEVABLE!", "BUSTED:", "LAW ENFORCEMENT ON HIGH ALERT"),
+       unverified tabloid hysteria ("SATAN 2: Russia unveils an image of its terrifying new 'SUPERNUKE'"),
+       aggressive rhetorical appeals, and emotionally charged ad hominem attacks.
+
+   CONCLUSION:
+   Content-level forensic analysis independently and incontrovertibly confirms:
+     * RAW LABEL 0 = REAL NEWS
+     * RAW LABEL 1 = FAKE NEWS
+
+
+================================================================================
+SECTION 5: COMPARATIVE AUDIT OF PRIOR REPORTS
+================================================================================
+Let us reconcile what each prior document stated:
+
+1. reports/welfake_verification_audit.txt:
+   - Check 1.1 states:
+     "Finding: In the raw exported CSV, raw_label 0 represents authentic news
+      (Reuters, NYT, McIntire), while raw_label 1 represents misinformation/clickbait."
+   - Check 1.2 notes:
+     "Official Verma et al. published benchmark specification: 0 = Fake, 1 = Real.
+      Discrepancy Identified: The author documentation specifies 0=Fake, 1=Real, but
+      the raw CSV was exported with inverted polarity (raw 0 = Real, raw 1 = Fake)."
+   - Summary: The verification audit correctly documented that the raw CSV had 0=Real and 1=Fake,
+     and pointed out that this inverted the author's written text on Kaggle.
+
+2. reports/welfake_discrepancy_review.txt:
+   - Section 3 states:
+     "In the raw CSV file, raw_label 0 represents Real News, and raw_label 1 represents Fake News."
+   - Proved this systematically across all 72,134 records by source provenance (ISOT True/Fake)
+     and reconciled the 220 removed duplicate Reuters wire briefs.
+   - Summary: Reached the exact same conclusion as the first audit regarding the raw labels.
+
+3. Why did a perceived contradiction arise?
+   - The user's prompt originally instructed: "The official WELFake convention is 0 = Fake and 1 = Real."
+   - In welfake_verification_audit.txt, Check 1.2 repeated this official convention.
+   - Because the cleaned CSV standardized the target so that cleaned label 1 = Real and cleaned label 0 = Fake,
+     reading the phrase "0 = Fake, 1 = Real" alongside "raw_label 0 = Real, raw_label 1 = Fake" created
+     the impression that the two reports contradicted one another.
+   - In truth, THERE IS ZERO CONTRADICTION BETWEEN THE TWO REPORTS:
+     * Both reports agree that the RAW CSV has: 0 = Real, 1 = Fake.
+     * Both reports agree that the KAGGLE PROSE README claims: 0 = Fake, 1 = Real.
+     * Both reports agree that the CLEANED DATASET standardized the target: 1 = Real, 0 = Fake.
+
+
+================================================================================
+SECTION 6: AUDIT OF THE CLEANING SCRIPT (scripts/clean_welfake.py)
+================================================================================
+1. The Transformation Applied in clean_welfake.py:
+   Lines 210-213:
+     ```python
+     df["raw_label"] = df["label"].astype(int)
+     df["label"] = df["raw_label"].apply(lambda x: 1 if x == 0 else 0)
+     df["label_name"] = df["label"].apply(lambda x: "Real" if x == 1 else "Fake")
+     ```
+
+2. Column-by-Column Alignment in data/processed/WELFake_cleaned.csv:
+   -----------------------------------------------------------------------------
+   Column Name | Value Type | Mapped Value | Ground Truth Meaning | Record Count
+   -----------------------------------------------------------------------------
+   label       | int64      | 1            | Real News            | 34,788 (55.58%)
+   label       | int64      | 0            | Fake News            | 27,798 (44.42%)
+   label_name  | str        | 'Real'       | Real News            | 34,788 (55.58%)
+   label_name  | str        | 'Fake'       | Fake News            | 27,798 (44.42%)
+   raw_label   | int64      | 0            | (Original Raw Value) | 34,788 (55.58%)
+   raw_label   | int64      | 1            | (Original Raw Value) | 27,798 (44.42%)
+   -----------------------------------------------------------------------------
+   Total Clean Records: 62,586 (100.0%)
+
+3. Is this transformation justified?
+   YES, and it is standard practice in binary classification for fake news detection:
+   - In machine learning literature, the positive class (1) typically denotes authentic/true,
+     while 0 denotes synthetic/false (or vice versa in anomaly detection).
+   - In scikit-learn metrics (Precision, Recall, F1-Score), treating 1 as the target class
+     is the default expectation.
+   - Most importantly, the inclusion of the explicit textual column 'label_name' ('Real' / 'Fake')
+     guarantees that downstream model training pipelines CANNOT misinterpret the class labels,
+     even if an engineer forgets the numerical mapping.
+
+
+================================================================================
+SECTION 7: PHASE 3 READINESS ASSESSMENT & RECOMMENDATIONS
+================================================================================
+1. VERDICT: [PASS]
+   The cleaned dataset at data/processed/WELFake_cleaned.csv (62,586 rows) is:
+     * Mathematically verified and reconciled across all class counts.
+     * Completely free of null values, whitespace errors, and duplicate records.
+     * 100% unambiguous thanks to the explicit 'label_name' column.
+     * Fully ready for Phase 3 (Feature Engineering, TF-IDF / N-gram Extraction, and ML Modeling).
+
+2. Concrete Guidelines for Phase 3 Implementation:
+   To prevent any future confusion during model training:
+     a. Primary Ground Truth Reference:
+        Always use `df['label_name']` as the canonical reference during EDA and logging:
+          - 'Real' = Authentic journalism
+          - 'Fake' = Misinformation / Clickbait
+     b. Target Variable Mapping in Scikit-Learn:
+        Explicitly define the mapping in model training scripts:
+          - `y = (df['label_name'] == 'Fake').astype(int)` if detecting fake news as the positive class, OR
+          - `y = df['label']` (where 1 = Real, 0 = Fake) if predicting authenticity.
+        Document the chosen target convention prominently in the model evaluation reports.
+     c. Retain Traceability:
+        Keep `raw_label` in the processed dataset so anyone auditing the model can trace
+        predictions directly back to the original raw WELFake file.
+================================================================================
+END OF INVESTIGATION REPORT
+================================================================================

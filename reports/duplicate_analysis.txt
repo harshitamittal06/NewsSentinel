@@ -1,0 +1,181 @@
+################################################################################
+  NEWSSENTINEL - PHASE 2: DUPLICATE & DATA LEAKAGE ANALYSIS AUDIT
+  Research-Grade Misinformation Corpus Diagnostics
+################################################################################
+  Project Root Directory: NewsSentinel project directory
+
+[*] Loading raw datasets into memory (Read-Only)...
+[+] All raw datasets loaded successfully.
+
+================================================================================
+ DATASET INVESTIGATION: WELFAKE DATASET
+ Total Records: 72,134
+================================================================================
+
+[1] Duplicate Titles Analysis:
+  * Total Normalized Duplicate Titles: 9,892 (13.71%)
+  * Unique Normalized Titles:         62,242
+  * Top 5 Most Repeated Titles:
+    1. [14x] "factbox: trump fills top jobs for his administration"
+    2. [8x] "will barack obama delay or suspend the election if hillary is forced out by..."
+    3. [8x] "get ready for civil unrest: survey finds that most americans are concerned ..."
+    4. [8x] "highlights: the trump presidency on april 13 at 9:30 p.m. edt/0130 gmt on f..."
+    5. [8x] "factbox: contenders for senior jobs in trump's administration"
+
+[2] Duplicate Article Bodies Analysis:
+  * Total Normalized Duplicate Texts:  9,432 (13.08%)
+  * Unique Normalized Article Texts:   62,702
+  * Top 5 Most Repeated Article Texts:
+    1. [58x] "killing obama administration rules, dismantling obamacare and pushing throu..."
+    2. [38x] "leave a reply click here to get more info on formatting (1) leave the name ..."
+    3. [36x] "click here to learn more about alexandra's personalized essences psychic pr..."
+    4. [33x] "source add to the conversation using facebook comments"
+    5. [23x] "a verdict in 2017 could have sweeping consequences for tech startups."
+
+[3] Identical (Title + Article Text) Pairs:
+  * Total Duplicate (Title + Text) Pairs: 8,462 (11.73%)
+  * Unique (Title + Text) Combinations:   63,672
+
+[4] Internal Label Conflict Analysis (Contradictory Ground Truth):
+  * [PASS] Zero internal label conflicts found among identical title-text pairs.
+
+--------------------------------------------------------------------------------
+
+================================================================================
+ DATASET INVESTIGATION: ISOT - REAL NEWS DATASET (TRUE.CSV)
+ Total Records: 21,417
+================================================================================
+
+[1] Duplicate Titles Analysis:
+  * Total Normalized Duplicate Titles: 593 (2.77%)
+  * Unique Normalized Titles:         20,824
+  * Top 5 Most Repeated Titles:
+    1. [14x] "factbox: trump fills top jobs for his administration"
+    2. [8x] "highlights: the trump presidency on april 13 at 9:30 p.m. edt/0130 gmt on f..."
+    3. [8x] "factbox: contenders for senior jobs in trump's administration"
+    4. [6x] "factbox: international reaction to arrest of reuters reporters in myanmar"
+    5. [5x] "highlights: the trump presidency on april 21 at 6:12 p.m. edt/2212 gmt"
+
+[2] Duplicate Article Bodies Analysis:
+  * Total Normalized Duplicate Texts:  227 (1.06%)
+  * Unique Normalized Article Texts:   21,190
+  * Top 5 Most Repeated Article Texts:
+    1. [8x] "(reuters) - highlights for u.s. president donald trump’s administration on ..."
+    2. [5x] "(reuters) - highlights for u.s. president donald trump’s administration on ..."
+    3. [5x] "(reuters) - highlights of the day for u.s. president donald trump’s adminis..."
+    4. [3x] "(reuters) - highlights for u.s. president donald trump’s administration on ..."
+    5. [2x] "(reuters) - republicans in the u.s. congress reached a deal on final tax le..."
+
+[3] Identical (Title + Article Text) Pairs:
+  * Total Duplicate (Title + Text) Pairs: 222 (1.04%)
+  * Unique (Title + Text) Combinations:   21,195
+
+[4] Internal Label Conflict Analysis:
+  * Single-class / implicit dataset. Internal label conflict check not applicable.
+
+--------------------------------------------------------------------------------
+
+================================================================================
+ DATASET INVESTIGATION: ISOT - FAKE NEWS DATASET (FAKE.CSV)
+ Total Records: 23,481
+================================================================================
+
+[1] Duplicate Titles Analysis:
+  * Total Normalized Duplicate Titles: 5,580 (23.76%)
+  * Unique Normalized Titles:         17,901
+  * Top 5 Most Repeated Titles:
+    1. [6x] "media ignores time that bill clinton fired his fbi director on day before v..."
+    2. [4x] "former fbi asst director: “jim comey ‘danced with the devil’…i’m glad he’s ..."
+    3. [4x] "elementary school plans ‘blacks only’ field trip to college for third grade..."
+    4. [3x] "former fbi asst director lets it rip! comey’s a ‘political hack’…sessions i..."
+    5. [3x] "classless clintons spew coordinated lies against trump on late night shows:..."
+
+[2] Duplicate Article Bodies Analysis:
+  * Total Normalized Duplicate Texts:  6,032 (25.69%)
+  * Unique Normalized Article Texts:   17,449
+  * Top 5 Most Repeated Article Texts:
+    1. [5x] "watch:"
+    2. [4x] "ap news the regulars amble in before dawn and claim their usual table, the ..."
+    3. [4x] "things didn t go as well as nicholle had hoped and now, she s lashing out a..."
+    4. [4x] "in its 109-year history, only one f.b.i. director had been fired until tues..."
+    5. [4x] "enjoy:"
+
+[3] Identical (Title + Article Text) Pairs:
+  * Total Duplicate (Title + Text) Pairs: 5,576 (23.75%)
+  * Unique (Title + Text) Combinations:   17,905
+
+[4] Internal Label Conflict Analysis:
+  * Single-class / implicit dataset. Internal label conflict check not applicable.
+
+--------------------------------------------------------------------------------
+
+================================================================================
+ CROSS-DATASET OVERLAP & GROUND-TRUTH ENCODING AUDIT
+ Comparing WELFake vs. ISOT (True.csv & Fake.csv)
+================================================================================
+
+[1] ISOT Cross-File Overlap (True.csv vs. Fake.csv):
+  * Identical (Title + Text) pairs shared between True.csv and Fake.csv: 0
+  * [PASS] Complete isolation between True.csv and Fake.csv (0 overlapping articles).
+
+[2] WELFake vs. ISOT Corpus Inclusion Discovery:
+  * ISOT True unique articles contained in WELFake: 21,195 of 21,195 (100.00%)
+  * ISOT Fake unique articles contained in WELFake: 17,905 of 17,905 (100.00%)
+  * Total ISOT articles present inside WELFake:    39,100 of 39,100 (100.00%)
+  * [KEY ARCHITECTURAL FINDING]:
+    The entire ISOT dataset (44,898 records) is a 100% SUBSET of WELFake_Dataset.csv!
+    WELFake was constructed by synthesizing ISOT (Reuters + Fake) with additional sources.
+
+[3] Ground-Truth Label Encoding Audit:
+  * WELFake Label Encoding Standard (Kaggle / Verma et al.):
+    - 'label = 0': Real / Authentic News (Reuters, McIntire)
+    - 'label = 1': Fake / Misinformation News (Kaggle Fake, BuzzFeed)
+  * ISOT File Separation Ground Truth:
+    - True.csv -> 100% Real News (corresponds to WELFake label 0)
+    - Fake.csv -> 100% Fake News (corresponds to WELFake label 1)
+
+  * Label Verification Results:
+    - ISOT True articles matching WELFake label 0 (Real): 21,195 (100.00%)
+    - ISOT True articles conflicting with WELFake:        0 (0.00%)
+    - ISOT Fake articles matching WELFake label 1 (Fake): 17,905 (100.00%)
+    - ISOT Fake articles conflicting with WELFake:        0 (0.00%)
+
+  * [CONCLUSION ON LABEL CONFLICTS]:
+    Under the verified ground-truth mapping (0=Real, 1=Fake), there is 100.00% LABEL AGREEMENT.
+    Zero articles have conflicting ground-truth classifications between WELFake and ISOT.
+    [WARNING]: If an engineer assumes 1=Real and 0=Fake, a 100% false contradiction occurs.
+
+================================================================================
+ POTENTIAL DATA LEAKAGE RISKS & MACHINE LEARNING IMPLICATIONS
+================================================================================
+1. 100% CROSS-DATASET LEAKAGE IF MERGED NAIVELY:
+   - WELFake_Dataset.csv already includes all 44,898 articles from ISOT (both True.csv and Fake.csv).
+   - If an engineer trains a model on WELFake and attempts to evaluate/test it on ISOT,
+     this constitutes a catastrophic 100% train-test data leakage violation.
+   - The test set would contain zero unseen data; evaluation accuracy would be artificially
+     inflated (99.8%+) while learning nothing generalizable.
+   - If merging datasets for training, strict deduplication across datasets is MANDATORY.
+
+2. INTRA-DATASET MEMORIZATION FROM DUPLICATE ARTICLES:
+   - High duplication within datasets (11.7% duplicate title-text pairs in WELFake; 23.8% in ISOT Fake).
+   - If standard random train_test_split() is performed without prior deduplication:
+     duplicate instances of the same article will land in both the training set and the test set.
+   - The classifier will achieve artificially high scores simply by memorizing exact n-grams from identical articles.
+
+3. SYNDICATED WIRE STORY BIAS (REUTERS):
+   - Over 21,000 real news articles in both ISOT and WELFake originate from Reuters wire reports,
+     frequently repeating header snippets like 'WASHINGTON (Reuters) -'.
+   - This creates a risk where the classifier learns to associate the word 'Reuters' with truth,
+     rather than learning semantic or stylistic markers of credibility.
+
+4. CLICKBAIT & REPOST SKEW IN FAKE NEWS:
+   - In ISOT Fake, 25.7% of article texts are duplicates (viral stories syndicated across blogs).
+   - This causes TF-IDF vectorizers to over-weight specific idiosyncratic words from those viral stories.
+
+RECOMMENDED PHASE 2 PREPROCESSING ACTIONS:
+   1. Complete Deduplication: Eliminate all duplicate (title + text) pairs before dataset splitting.
+   2. Leakage Prevention: Since ISOT is fully contained in WELFake, use WELFake as the unified master
+      corpus (72,134 records) to avoid redundant duplication, OR deduplicate the merged corpus completely.
+   3. Publisher Header Scrubbing: Strip recurring wire signatures ('(Reuters) -', etc.) to prevent shortcut learning.
+   4. Missing Text Filtering: Discard the 558 null titles and 39 null texts identified during inspection.
+================================================================================

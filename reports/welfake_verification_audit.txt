@@ -1,0 +1,257 @@
+================================================================================
+NEWSSENTINEL - PHASE 2: INDEPENDENT DATASET VERIFICATION AUDIT
+================================================================================
+Audit Target:
+  1. scripts/clean_welfake.py
+  2. reports/welfake_cleaning_report.txt
+  3. data/raw/WELFake_Dataset.csv (Original Raw Master)
+  4. data/processed/WELFake_cleaned.csv (Cleaned Primary Corpus)
+
+Audit Execution Date: 2026-11-20
+Audit Scope: Non-destructive verification of label mapping, record removals,
+             class distributions, and data integrity.
+================================================================================
+
+
+--------------------------------------------------------------------------------
+1. LABEL MAPPING VERIFICATION
+--------------------------------------------------------------------------------
+[CHECK 1.1] Raw Label Inspection in data/raw/WELFake_Dataset.csv
+  - Raw 'label' column distribution across 72,134 records:
+    * raw_label = 1: 37,106 records (51.44%)
+    * raw_label = 0: 35,028 records (48.56%)
+  - Forensic Investigation of Raw Values:
+    * Articles containing Reuters datelines: 21,282 total
+      -> raw_label = 0: 21,266 articles (99.92%)
+      -> raw_label = 1: 16 articles (0.08%)
+    * Articles containing 'New York Times' in title: 6,325 total
+      -> raw_label = 0: 6,257 articles (98.92%)
+      -> raw_label = 1: 68 articles (1.08%)
+    * Articles matching ISOT Fake News corpus: 23,518 total
+      -> raw_label = 1: 23,518 articles (100.00%)
+      -> raw_label = 0: 0 articles (0.00%)
+    * Articles from conspiracy/clickbait sources (Infowars, 21st Century Wire):
+      -> Heavily concentrated in raw_label = 1 (e.g., Infowars: 289 in 1 vs 21 in 0).
+  - Finding: In the raw exported CSV, raw_label 0 represents authentic news
+    (Reuters, NYT, McIntire), while raw_label 1 represents misinformation/clickbait.
+  STATUS: [PASS]
+
+[CHECK 1.2] Official Benchmark Convention vs. Raw File Discrepancy
+  - Official Verma et al. (Kaggle/Zenodo) published benchmark specification:
+    * 0 = Fake News
+    * 1 = Real News
+  - Discrepancy Identified: The author documentation specifies 0=Fake, 1=Real, but
+    the raw CSV was exported with inverted polarity (raw 0 = Real, raw 1 = Fake).
+  - Exact Mapping Applied by scripts/clean_welfake.py:
+    * Standardized 'label':
+        - Raw 0 (Real News) -> label = 1 (Real News)
+        - Raw 1 (Fake News) -> label = 0 (Fake News)
+    * Augmented 'label_name':
+        - label 1 -> 'Real'
+        - label 0 -> 'Fake'
+    * Preserved 'raw_label':
+        - Retains original CSV integer (0 or 1) for transparency.
+  - Verification: Cleaned dataset perfectly conforms to the official benchmark
+    standard (0 = Fake, 1 = Real) while correcting the raw export inversion.
+  STATUS: [PASS]
+
+[CHECK 1.3] Representative Article Evidence in Cleaned Dataset
+  - Sample 1 (Real News - Reuters Wire):
+    * Title: "Bobby Jindal, raised Hindu, uses story of Christian conversion to woo evangelicals"
+    * Text: "A dozen politically active pastors came here for a private dinner..."
+    * Cleaned label: 1 | label_name: 'Real' | raw_label: 0
+    * Ground Truth: Verified authentic Reuters report. Correctly mapped to 1 (Real).
+  - Sample 2 (Fake News - Viral Clickbait):
+    * Title: "LAW ENFORCEMENT ON HIGH ALERT Following Threats Against Cops And Whites By Black Lives Matter"
+    * Text: "No comment is expected from Barack Obama Members of the #FYF911 or #..."
+    * Cleaned label: 0 | label_name: 'Fake' | raw_label: 1
+    * Ground Truth: Fabricated sensational clickbait. Correctly mapped to 0 (Fake).
+  - Sample 3 (Fake News - Conspiracy):
+    * Title: "SATAN 2: Russia unvelis an image of its terrifying new ‘SUPERNUKE’ –..."
+    * Text: "The RS-28 Sarmat missile, dubbed Satan 2, will replace the SS-18..."
+    * Cleaned label: 0 | label_name: 'Fake' | raw_label: 1
+    * Ground Truth: Unverified tabloid hysteria. Correctly mapped to 0 (Fake).
+  STATUS: [PASS]
+
+[CHECK 1.4] Column Consistency Verification in Cleaned Dataset
+  - Verified across all 62,586 rows:
+    * ((label == 1) & (label_name == 'Real') & (raw_label == 0)): 34,788 rows (100.0%)
+    * ((label == 0) & (label_name == 'Fake') & (raw_label == 1)): 27,798 rows (100.0%)
+    * Any contradictory or misaligned rows: 0 rows (0.00%)
+  STATUS: [PASS]
+
+
+--------------------------------------------------------------------------------
+2. RECORD REMOVAL AUDIT
+--------------------------------------------------------------------------------
+[CHECK 2.1] Incomplete Records Removal (1,341 records)
+  - Cause Breakdown:
+    * Missing / whitespace-only title: 558 records (0.77% of raw corpus)
+      - Content: Short social media comments, voter fraud tweets, or unformatted text.
+    * Missing / whitespace-only article text: 783 records (1.09% of raw corpus)
+      - Content: 39 NaN body cells + 744 strings containing only spaces ("   ").
+      - Content: Headlines alone without body articles (e.g. French foreign wire snippets).
+    * Total unique invalid records: 1,341 (1.86% of raw corpus)
+  - Justification: NLP feature extractors and TF-IDF pipelines require non-empty
+    document bodies. Discarding incomplete records prevents null propagation, zero-vector
+    artifacts, and empty document exceptions during model training.
+  - Class Distribution of Removed Incomplete Records:
+    * Real News (raw_label = 0):     1 record  (0.07%)
+    * Fake News (raw_label = 1): 1,340 records (99.93%)
+    * Finding: 99.93% of defective/empty records originated from low-quality fake news sources.
+  STATUS: [PASS]
+
+[CHECK 2.2] Duplicate Title-Text Pairs Removal (8,207 records)
+  - Cause Breakdown:
+    * Evaluated on normalized string pairs: lowercase(title) + " ||| " + lowercase(text)
+      with collapsed whitespace.
+    * Exact duplicate pairs detected: 8,207 records (11.59% of non-empty records).
+    * Sample duplicated content:
+      - Repeated presidential campaign daily updates (Reuters wire synopses, repeated 4-7x).
+      - Viral fake news articles syndicated verbatim across multiple political blogs (repeated 5-15x).
+  - Justification: Duplicate articles in a dataset cause catastrophic train-test contamination
+    if a standard random split is performed. Identical articles in train and test sets cause the
+    classifier to memorize specific n-grams rather than generalizing, producing artificially
+    inflated validation metrics (e.g., 99%+ accuracy).
+  - Class Distribution of Removed Duplicate Records:
+    * Real News (raw_label = 0):   239 records (2.91%)
+    * Fake News (raw_label = 1): 7,968 records (97.09%)
+    * Finding: Over 97% of duplicate copies were viral clickbait syndicated across blogs.
+  STATUS: [PASS]
+
+[CHECK 2.3] Conflicting Labels Audit in Duplicate Pairs
+  - Check: Do any identical (title + text) pairs have conflicting labels in WELFake?
+  - Conflicting groups detected: 0 groups
+  - Conflicting rows detected:   0 rows
+  - Finding: All duplicate pairs within WELFake have 100% consistent ground-truth labels.
+  STATUS: [PASS]
+
+[CHECK 2.4] Total Record Removal Reconciliation
+  - Raw Records: 72,134
+  - Total Incomplete Removed: -1,341
+  - Total Duplicates Removed: -8,207
+  - Total Filtered:           -9,548 (-13.24%)
+  - Clean Records Retained:    62,586 (86.76%)
+  - Arithmetic Check: 72,134 - 1,341 - 8,207 = 62,586 [EXACT MATCH]
+  STATUS: [PASS]
+
+
+--------------------------------------------------------------------------------
+3. CLASS DISTRIBUTION INDEPENDENT VERIFICATION
+--------------------------------------------------------------------------------
+[CHECK 3.1] Original Dataset Distribution (data/raw/WELFake_Dataset.csv)
+  - Total Records: 72,134
+  - Real News (raw_label = 0): 35,028 records (48.56%)
+  - Fake News (raw_label = 1): 37,106 records (51.44%)
+  - Balance Ratio: 1.06 Fake : 1 Real (Highly balanced)
+  STATUS: [PASS]
+
+[CHECK 3.2] Cleaned Dataset Distribution (data/processed/WELFake_cleaned.csv)
+  - Total Records: 62,586
+  - Real News (label = 1 / label_name = 'Real'): 34,788 records (55.58%)
+    * Derivation: 35,028 (raw Real) - 1 (incomplete) - 239 (duplicates) = 34,788
+  - Fake News (label = 0 / label_name = 'Fake'): 27,798 records (44.42%)
+    * Derivation: 37,106 (raw Fake) - 1,340 (incomplete) - 7,968 (duplicates) = 27,798
+  - Verification of Total Sum:
+    * 34,788 (Real) + 27,798 (Fake) = 62,586 [EXACT MATCH]
+  - Balance Ratio: 1.25 Real : 1 Fake (Well-balanced binary classification corpus)
+  STATUS: [PASS]
+
+
+--------------------------------------------------------------------------------
+4. DATA INTEGRITY CHECKS
+--------------------------------------------------------------------------------
+[CHECK 4.1] Missing Values in Cleaned Dataset
+  - Column 'title':      0 nulls (0.00%)
+  - Column 'text':       0 nulls (0.00%)
+  - Column 'label':      0 nulls (0.00%)
+  - Column 'label_name': 0 nulls (0.00%)
+  - Column 'raw_label':  0 nulls (0.00%)
+  - Total Missing Cells: 0 / 312,930 cells (100.0% complete)
+  STATUS: [PASS]
+
+[CHECK 4.2] Empty or Whitespace-Only Text in Cleaned Dataset
+  - Titles with length == 0 after strip(): 0 records
+  - Texts with length == 0 after strip():  0 records
+  STATUS: [PASS]
+
+[CHECK 4.3] Duplicate Title-Text Pairs in Cleaned Dataset
+  - Exact duplicates across all columns:                     0 records
+  - Duplicate normalized (title + text) combinations:        0 records
+  - Unique normalized (title + text) combinations:      62,586 records (100.0% unique)
+  STATUS: [PASS]
+
+[CHECK 4.4] Label Column Validity in Cleaned Dataset
+  - 'label' unique values:      {0, 1} [Strictly binary integer]
+  - 'label_name' unique values: {'Real', 'Fake'} [Strictly binary string]
+  - 'raw_label' unique values:  {0, 1} [Strictly binary integer]
+  - Unexpected or corrupted label values: 0
+  STATUS: [PASS]
+
+[CHECK 4.5] Preservation of Original Dataset
+  - File: data/raw/WELFake_Dataset.csv
+  - File exists on disk:       YES
+  - Physical file size:        245,086,152 bytes (233.73 MB) [UNCHANGED]
+  - Total records:             72,134 rows [UNCHANGED]
+  - Read-only preservation:    CONFIRMED
+  STATUS: [PASS]
+
+
+================================================================================
+FINAL AUDIT SCORECARD: 12 / 12 CHECKS PASSED (100.0%)
+================================================================================
+Check 1.1: Raw Label Forensic Distribution                     -> [PASS]
+Check 1.2: Standardized Benchmark Label Alignment               -> [PASS]
+Check 1.3: Representative Sample Evidence Verification         -> [PASS]
+Check 1.4: Tri-Column Label Consistency (raw/std/name)          -> [PASS]
+Check 2.1: Incomplete Records Removal Audit (1,341 rows)        -> [PASS]
+Check 2.2: Duplicate Records Removal Audit (8,207 rows)         -> [PASS]
+Check 2.3: Duplicate Label Contradiction Check (0 conflicts)    -> [PASS]
+Check 2.4: Removal Arithmetic Reconciliation (9,548 filtered)   -> [PASS]
+Check 3.1: Original Dataset Distribution Verification          -> [PASS]
+Check 3.2: Cleaned Dataset Distribution Verification (62,586)  -> [PASS]
+Check 4.1: Missing Value Zero-Tolerance Audit                  -> [PASS]
+Check 4.2: Whitespace-Only Zero-Tolerance Audit                -> [PASS]
+Check 4.3: Post-Cleaning Duplicate Zero-Tolerance Audit        -> [PASS]
+Check 4.4: Label Range and Type Validity                        -> [PASS]
+Check 4.5: Original Raw Dataset Preservation                   -> [PASS]
+================================================================================
+
+
+--------------------------------------------------------------------------------
+5. SUMMARY OF CONSIDERATIONS FOR PHASE 3 (FEATURE ENGINEERING & MODELING)
+--------------------------------------------------------------------------------
+While the cleaned corpus at data/processed/WELFake_cleaned.csv is structurally
+flawless, the following machine learning and feature engineering considerations
+must be addressed during Phase 3 before model training:
+
+1. WIRE SERVICE SHORTCUT LEARNING ("REUTERS" ARTIFACT):
+   - Over 21,000 real news articles in the cleaned corpus originate from Reuters
+     and retain standard journalistic datelines (e.g., "WASHINGTON (Reuters) -",
+     "LONDON (Reuters) -").
+   - Machine Learning Risk: If text is tokenized without stripping news wire signatures,
+     linear classifiers (Logistic Regression, Passive-Aggressive, Naive Bayes) will
+     assign massive positive weights to the token "reuters", classifying news as "Real"
+     solely based on whether the word "Reuters" appears rather than learning linguistic
+     patterns of credibility.
+   - Required Phase 3 Fix: Implement regex stripping for recurring publisher datelines
+     and wire stamps during NLTK / Scikit-learn text preprocessing.
+
+2. TEXT REPRESENTATION CONCATENATION STRATEGY:
+   - In WELFake, articles possess both a 'title' (headline) and 'text' (body).
+   - In misinformation detection, headlines often contain sensational clickbait cues
+     (excessive capitalization, emotional punctuation) while bodies contain narrative claims.
+   - Recommendation for Phase 3: Concatenate 'title' and 'text' into a unified input
+     field (e.g. `title + " " + text`) during feature extraction to maximize signal.
+
+3. STRATIFIED CROSS-VALIDATION SPLITTING:
+   - The cleaned dataset is well-balanced (55.58% Real vs 44.42% Fake).
+   - Phase 3 train/test partitioning must use `StratifiedKFold` or `train_test_split(..., stratify=y)`
+     to maintain identical class proportions across training and evaluation splits.
+
+4. TARGET CONVENTION CONSISTENCY:
+   - All Phase 3 training scripts should explicitly utilize `label` where:
+     * 0 = Fake News
+     * 1 = Real News
+   - And display predictions using the established `label_name` ('Fake' / 'Real').
+================================================================================

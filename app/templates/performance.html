@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}Model Performance{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="hero-banner">
+  <div class="hero-tag">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M18 20V10"></path>
+      <path d="M12 20V4"></path>
+      <path d="M6 20v-6"></path>
+    </svg>
+    <span>Empirical Evaluation & Model Telemetry</span>
+  </div>
+  <h1 class="hero-title">Model <span class="gradient-text">Performance Blueprint</span></h1>
+  <p class="hero-subtitle">
+    Empirical evaluation metrics, confusion matrix, and candidate model benchmarks for the NewsSentinel classification pipeline.
+    All figures are derived from our Phase 3 held-out test evaluation on 9,388 unseen articles from the WELFake benchmark corpus.
+  </p>
+</section>
+
+<!-- Advisory Disclaimer Banner -->
+<div class="integrity-notice" style="margin-bottom: 24px;">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="12" y1="8" x2="12" y2="12"></line>
+    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+  </svg>
+  <div class="integrity-notice-text">
+    <h4>Advisory & Operational Disclaimer</h4>
+    <p>
+      <strong>NewsSentinel identifies linguistic patterns learned from its training data. It does not independently verify sources, events, quotations or factual claims.</strong>
+      Model evaluation scores reflect pattern detection accuracy on the cleaned WELFake dataset. Model confidence indicates training distribution alignment, not factual certainty.
+    </p>
+  </div>
+</div>
+
+<!-- Core Evaluation Metrics Grid (Real Phase 3 Metrics) -->
+<section class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card-top">
+      <span class="stat-label">Test Set Accuracy</span>
+      <div class="stat-icon stat-icon-cyan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 14 14"></polyline>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">96.59%</div>
+    <div class="stat-meta">
+      <span class="stat-pill stat-pill-active" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3);">9,388 Unseen Articles</span>
+      <span>Held-out evaluation</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-top">
+      <span class="stat-label">Precision (Macro)</span>
+      <div class="stat-icon stat-icon-violet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">96.56%</div>
+    <div class="stat-meta">
+      <span class="stat-pill stat-pill-neutral">Real: 96.9% | Fake: 96.2%</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-top">
+      <span class="stat-label">Recall (Sensitivity)</span>
+      <div class="stat-icon stat-icon-green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">96.55%</div>
+    <div class="stat-meta">
+      <span class="stat-pill stat-pill-neutral">Real: 97.0% | Fake: 96.1%</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-top">
+      <span class="stat-label">Macro F1-Score</span>
+      <div class="stat-icon stat-icon-red">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">0.9655</div>
+    <div class="stat-meta">
+      <span class="stat-pill stat-pill-active" style="background: rgba(56, 189, 248, 0.15); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.3);">Harmonic Mean</span>
+    </div>
+  </div>
+</section>
+
+<!-- Visual Diagnostics: Confusion Matrix & Breakdown -->
+<section class="analytics-dual-grid" style="margin-bottom: 24px;">
+  <!-- Confusion Matrix -->
+  <div class="analytics-card">
+    <div class="analytics-card-header">
+      <div>
+        <h3 class="analytics-title">Confusion Matrix (Held-out Test Set)</h3>
+        <p class="analytics-subtitle">Breakdown across 9,388 unseen test articles.</p>
+      </div>
+      <span class="stat-pill stat-pill-active" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3);">Empirical Data</span>
+    </div>
+
+    <div style="padding: 18px 0;">
+      <table class="custom-table" style="text-align: center;">
+        <thead>
+          <tr>
+            <th style="text-align: left;">Ground Truth</th>
+            <th>Pred. FAKE (0)</th>
+            <th>Pred. REAL (1)</th>
+            <th>Total Class</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: left; font-weight: 600; color: #FB7185;">Actual FAKE (0)</td>
+            <td style="color: #34D399; font-weight: 700; font-family: var(--font-mono); background: rgba(16, 185, 129, 0.08);">4,008 (TN)</td>
+            <td style="color: #FB7185; font-family: var(--font-mono); background: rgba(244, 63, 94, 0.08);">162 (FP)</td>
+            <td style="font-family: var(--font-mono);">4,170</td>
+          </tr>
+          <tr>
+            <td style="text-align: left; font-weight: 600; color: #34D399;">Actual REAL (1)</td>
+            <td style="color: #FB7185; font-family: var(--font-mono); background: rgba(244, 63, 94, 0.08);">158 (FN)</td>
+            <td style="color: #34D399; font-weight: 700; font-family: var(--font-mono); background: rgba(16, 185, 129, 0.08);">5,060 (TP)</td>
+            <td style="font-family: var(--font-mono);">5,218</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top: 14px; font-size: 0.78rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+        <span>False Positive Rate: 3.88%</span>
+        <span>False Negative Rate: 3.03%</span>
+        <span>Total Evaluated: 9,388</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Model Configuration -->
+  <div class="analytics-card">
+    <div class="analytics-card-header">
+      <div>
+        <h3 class="analytics-title">Production Configuration</h3>
+        <p class="analytics-subtitle">Active classifier & vectorizer specifications.</p>
+      </div>
+      <span class="stat-pill stat-pill-neutral">Phase 3</span>
+    </div>
+
+    <div style="padding: 10px 0;">
+      <div class="feature-box" style="margin-bottom: 10px;">
+        <div class="feature-title">Selected Champion Model</div>
+        <div style="font-weight: 700; color: var(--text-main);">Linear Support Vector Machine (LinearSVC)</div>
+        <div style="font-size: 0.76rem; color: var(--text-muted);">Calibrated with 3-fold Platt scaling for probability estimation</div>
+      </div>
+      <div class="feature-box" style="margin-bottom: 10px;">
+        <div class="feature-title">Feature Extraction</div>
+        <div style="font-weight: 700; color: var(--text-main);">TF-IDF (1, 2) Unigrams + Bigrams</div>
+        <div style="font-size: 0.76rem; color: var(--text-muted);">Vocabulary size: 50,000 features &bull; Sublinear TF enabled</div>
+      </div>
+      <div class="feature-box">
+        <div class="feature-title">Training Partition</div>
+        <div style="font-weight: 700; color: var(--text-main);">70% Train / 15% Validation / 15% Test</div>
+        <div style="font-size: 0.76rem; color: var(--text-muted);">Stratified by class &bull; Random State: 42 &bull; 0 Data Leakage</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Candidate Model Benchmark Comparison Table -->
+<section class="data-table-container">
+  <div class="analytics-card-header" style="margin-bottom: 16px;">
+    <div>
+      <h3 class="analytics-title">Phase 3 Candidate Model Comparison</h3>
+      <p class="analytics-subtitle">Benchmarked across identical stratified splits on WELFake_cleaned.csv (62,586 records).</p>
+    </div>
+  </div>
+
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th>Candidate Algorithm</th>
+        <th>Val Accuracy</th>
+        <th>Val Macro F1</th>
+        <th>Test Accuracy</th>
+        <th>Test Macro F1</th>
+        <th>Training Time</th>
+        <th>Selection Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background: rgba(16, 185, 129, 0.05); border-left: 3px solid #10B981;">
+        <td><strong>Linear SVM (Calibrated)</strong></td>
+        <td><strong>97.21%</strong></td>
+        <td><strong>0.9717</strong></td>
+        <td><strong>96.59%</strong></td>
+        <td><strong>0.9655</strong></td>
+        <td>5.32s</td>
+        <td><span class="stat-pill stat-pill-active" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3);">CHAMPION</span></td>
+      </tr>
+      <tr>
+        <td>Logistic Regression (L2)</td>
+        <td>96.19%</td>
+        <td>0.9613</td>
+        <td>95.52%</td>
+        <td>0.9546</td>
+        <td>1.69s</td>
+        <td><span class="stat-pill stat-pill-neutral">Candidate</span></td>
+      </tr>
+      <tr>
+        <td>Multinomial Naive Bayes</td>
+        <td>89.78%</td>
+        <td>0.8969</td>
+        <td>90.07%</td>
+        <td>0.8998</td>
+        <td>0.15s</td>
+        <td><span class="stat-pill stat-pill-neutral">Candidate</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+{% endblock %}

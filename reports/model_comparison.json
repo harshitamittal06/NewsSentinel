@@ -1,0 +1,200 @@
+{
+  "Multinomial Naive Bayes": {
+    "description": "Multinomial Naive Bayes with Laplace smoothing (alpha=0.1)",
+    "validation_metrics": {
+      "accuracy": 0.8978483170004261,
+      "confusion_matrix": {
+        "TN_fake": 3755,
+        "FP_predicted_real": 414,
+        "FN_predicted_fake": 545,
+        "TP_real": 4674,
+        "raw_matrix": [
+          [
+            3755,
+            414
+          ],
+          [
+            545,
+            4674
+          ]
+        ]
+      },
+      "fake_class_0": {
+        "precision": 0.8732558139534884,
+        "recall": 0.9006956104581434,
+        "f1_score": 0.8867634903766678
+      },
+      "real_class_1": {
+        "precision": 0.9186320754716981,
+        "recall": 0.8955738647250431,
+        "f1_score": 0.9069564373726594
+      },
+      "macro_f1": 0.8968599638746636,
+      "weighted_f1": 0.8979892030281463,
+      "train_time_seconds": 0.151
+    },
+    "test_metrics": {
+      "accuracy": 0.9007243289305497,
+      "confusion_matrix": {
+        "TN_fake": 3789,
+        "FP_predicted_real": 381,
+        "FN_predicted_fake": 551,
+        "TP_real": 4667,
+        "raw_matrix": [
+          [
+            3789,
+            381
+          ],
+          [
+            551,
+            4667
+          ]
+        ]
+      },
+      "fake_class_0": {
+        "precision": 0.8730414746543779,
+        "recall": 0.9086330935251798,
+        "f1_score": 0.89048178613396
+      },
+      "real_class_1": {
+        "precision": 0.9245245641838352,
+        "recall": 0.8944039862016098,
+        "f1_score": 0.909214884083382
+      },
+      "macro_f1": 0.899848335108671,
+      "weighted_f1": 0.9008939404905943
+    }
+  },
+  "Logistic Regression": {
+    "description": "Logistic Regression with L2 regularization (C=1.0, solver='lbfgs')",
+    "validation_metrics": {
+      "accuracy": 0.9618662121857691,
+      "confusion_matrix": {
+        "TN_fake": 3970,
+        "FP_predicted_real": 199,
+        "FN_predicted_fake": 159,
+        "TP_real": 5060,
+        "raw_matrix": [
+          [
+            3970,
+            199
+          ],
+          [
+            159,
+            5060
+          ]
+        ]
+      },
+      "fake_class_0": {
+        "precision": 0.9614918866553644,
+        "recall": 0.9522667306308468,
+        "f1_score": 0.9568570739937334
+      },
+      "real_class_1": {
+        "precision": 0.9621601064841224,
+        "recall": 0.969534393561985,
+        "f1_score": 0.9658331742698988
+      },
+      "macro_f1": 0.961345124131816,
+      "weighted_f1": 0.9618470896883764,
+      "train_time_seconds": 1.691
+    },
+    "test_metrics": {
+      "accuracy": 0.9551555176821475,
+      "confusion_matrix": {
+        "TN_fake": 3950,
+        "FP_predicted_real": 220,
+        "FN_predicted_fake": 201,
+        "TP_real": 5017,
+        "raw_matrix": [
+          [
+            3950,
+            220
+          ],
+          [
+            201,
+            5017
+          ]
+        ]
+      },
+      "fake_class_0": {
+        "precision": 0.9515779330281859,
+        "recall": 0.947242206235012,
+        "f1_score": 0.9494051195769739
+      },
+      "real_class_1": {
+        "precision": 0.9579912163452359,
+        "recall": 0.9614794940590264,
+        "f1_score": 0.9597321855571497
+      },
+      "macro_f1": 0.9545686525670618,
+      "weighted_f1": 0.9551450674129942
+    }
+  },
+  "Linear SVM (Calibrated)": {
+    "description": "Linear Support Vector Classifier with 3-fold Platt probability calibration",
+    "validation_metrics": {
+      "accuracy": 0.972092032381764,
+      "confusion_matrix": {
+        "TN_fake": 4034,
+        "FP_predicted_real": 135,
+        "FN_predicted_fake": 127,
+        "TP_real": 5092,
+        "raw_matrix": [
+          [
+            4034,
+            135
+          ],
+          [
+            127,
+            5092
+          ]
+        ]
+      },
+      "fake_class_0": {
+        "precision": 0.9694784907474164,
+        "recall": 0.9676181338450468,
+        "f1_score": 0.968547418967587
+      },
+      "real_class_1": {
+        "precision": 0.9741725655251579,
+        "recall": 0.9756658363671201,
+        "f1_score": 0.9749186291403408
+      },
+      "macro_f1": 0.9717330240539639,
+      "weighted_f1": 0.9720893177630282,
+      "train_time_seconds": 5.325
+    },
+    "test_metrics": {
+      "accuracy": 0.965913932680017,
+      "confusion_matrix": {
+        "TN_fake": 4008,
+        "FP_predicted_real": 162,
+        "FN_predicted_fake": 158,
+        "TP_real": 5060,
+        "raw_matrix": [
+          [
+            4008,
+            162
+          ],
+          [
+            158,
+            5060
+          ]
+        ]
+      },
+      "fake_class_0": {
+        "precision": 0.9620739318290926,
+        "recall": 0.9611510791366906,
+        "f1_score": 0.9616122840690979
+      },
+      "real_class_1": {
+        "precision": 0.9689774032937571,
+        "recall": 0.9697201993100805,
+        "f1_score": 0.9693486590038314
+      },
+      "macro_f1": 0.9654804715364647,
+      "weighted_f1": 0.9659122845387867
+    }
+  }
+}

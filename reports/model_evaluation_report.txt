@@ -1,0 +1,61 @@
+================================================================================
+NEWSSENTINEL - PHASE 3: ML MODEL BENCHMARK & EVALUATION REPORT
+================================================================================
+Execution Date:      2026-11-20 01:34:14
+Total Corpus:        62,586 records (data/processed/WELFake_cleaned.csv)
+Train / Val / Test:  43,810 (70%) / 9,388 (15%) / 9,388 (15%) [Stratified]
+Feature Extractor:   TF-IDF Unigrams + Bigrams (50,000 max features, sublinear TF)
+Label Convention:    0 = Fake News, 1 = Real News
+================================================================================
+
+--------------------------------------------------------------------------------
+1. CANDIDATE MODEL COMPARISON (VALIDATION SET - MODEL SELECTION GATE)
+--------------------------------------------------------------------------------
+Model Name                   | Accuracy  | Macro F1  | Fake F1  | Real F1  | Train Time
+--------------------------------------------------------------------------------
+Multinomial Naive Bayes      |   89.78% |    0.8969 |   0.8868 |   0.9070 |     0.15s
+Logistic Regression          |   96.19% |    0.9613 |   0.9569 |   0.9658 |     1.69s
+Linear SVM (Calibrated)      |   97.21% |    0.9717 |   0.9685 |   0.9749 |     5.33s
+--------------------------------------------------------------------------------
+CHAMPION MODEL SELECTED BASED ON VALIDATION SET: 'Linear SVM (Calibrated)'
+
+--------------------------------------------------------------------------------
+2. FINAL HELD-OUT TEST SET EVALUATION (GENERALIZATION PERFORMANCE)
+--------------------------------------------------------------------------------
+Model Name                   | Accuracy  | Macro F1  | Fake F1  | Real F1  | Status
+--------------------------------------------------------------------------------
+Multinomial Naive Bayes      |   90.07% |    0.8998 |   0.8905 |   0.9092 | Candidate
+Logistic Regression          |   95.52% |    0.9546 |   0.9494 |   0.9597 | Candidate
+Linear SVM (Calibrated)      |   96.59% |    0.9655 |   0.9616 |   0.9693 | CHAMPION
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+3. IN-DEPTH AUDIT OF CHAMPION MODEL: Linear SVM (Calibrated)
+--------------------------------------------------------------------------------
+Validation Set Performance:
+  * Accuracy:     97.21%
+  * Macro F1:     0.9717
+  * Fake (0):     Precision = 96.95% | Recall = 96.76% | F1 = 0.9685
+  * Real (1):     Precision = 97.42% | Recall = 97.57% | F1 = 0.9749
+  * Confusion Matrix: TN (Fake)=4,034, FP (Fake as Real)=135, FN (Real as Fake)=127, TP (Real)=5,092
+
+Test Set Performance (Held-Out Final Evaluation):
+  * Accuracy:     96.59%
+  * Macro F1:     0.9655
+  * Fake (0):     Precision = 96.21% | Recall = 96.12% | F1 = 0.9616
+  * Real (1):     Precision = 96.90% | Recall = 96.97% | F1 = 0.9693
+  * Confusion Matrix: TN (Fake)=4,008, FP (Fake as Real)=162, FN (Real as Fake)=158, TP (Real)=5,060
+
+--------------------------------------------------------------------------------
+4. ARTIFACT PERSISTENCE & DEPLOYMENT READINESS
+--------------------------------------------------------------------------------
+Serialized Artifacts:
+  * Model Binary:      models/best_model.joblib
+  * TF-IDF Vectorizer: models/tfidf_vectorizer.joblib
+  * Model Metadata:    models/model_metadata.json
+
+Phase 3 Execution Summary:
+  * Total Execution Time: 194.72 seconds
+  * Training Integrity:   Zero data leakage; test set isolated until after model selection.
+  * Production Status:    READY FOR FASTAPI INFERENCE INTEGRATION (PHASE 4)
+================================================================================
