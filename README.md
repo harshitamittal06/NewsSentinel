@@ -220,3 +220,12 @@ To avoid misleading users, NewsSentinel strictly adheres to descriptive, non-dog
    - Primary corpus is completely deduplicated (8,207 identical title-text pairs eliminated), and ISOT is documented as being contained within WELFake.
 6. **Standardized Ground Truth**:
    - Target encoding is explicitly verified and aligned with benchmark literature (`0 = Fake`, `1 = Real`).
+
+<img width="959" height="440" alt="image" src="https://github.com/user-attachments/assets/4ad0dd7a-46b2-4fa1-994a-ac9b26b3096c" />
+<img width="959" height="437" alt="image" src="https://github.com/user-attachments/assets/2a3660f3-926c-4ffb-8c66-005e1ea7fcb8" />
+<img width="959" height="434" alt="image" src="https://github.com/user-attachments/assets/508aa642-f025-4c58-b059-075eaaa13c00" />
+<img width="957" height="438" alt="image" src="https://github.com/user-attachments/assets/c4845845-de0c-4cfd-a91c-9c0bb10fec66" />
+<img width="958" height="440" alt="image" src="https://github.com/user-attachments/assets/1edfbd74-bc97-4ef6-91bf-3ae909846c0f" />
+<img width="959" height="435" alt="image" src="https://github.com/user-attachments/assets/eef8d94c-2a08-4bd3-8fc3-b6c6c7d3ed6d" />
+<img width="958" height="437" alt="image" src="https://github.com/user-attachments/assets/d8e27557-71f6-4a99-922f-1acb2953bc75" />
+
